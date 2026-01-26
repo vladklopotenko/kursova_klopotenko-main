@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Energy</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <a class="logo" href="#route=home" data-route="home" aria-label="Go to Home">YourEnergy</a>
+
+        <button class="burger" type="button" aria-label="Open menu" aria-expanded="false">
+          ☰
+        </button>
+
+        <nav class="nav" aria-label="Main navigation">
+          <a class="nav__link" href="#route=home" data-route="home">Home</a>
+          <a class="nav__link" href="#route=favorites" data-route="favorites">Favorites</a>
+        </nav>
+
+        <ul class="social" aria-label="Social links">
+          <li>
+            <a
+              href="https://www.facebook.com/goITclub/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              >FB</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.instagram.com/goitclub/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              >IG</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.youtube.com/c/GoIT"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              >YT</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="mobile-menu" hidden>
+        <a class="mobile-menu__link" href="#route=home" data-route="home">Home</a>
+        <a class="mobile-menu__link" href="#route=favorites" data-route="favorites">Favorites</a>
+        <div class="mobile-menu__social">
+          <a
+            href="https://www.facebook.com/goITclub/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            >Facebook</a
+          >
+          <a
+            href="https://www.instagram.com/goitclub/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            >Instagram</a
+          >
+          <a
+            href="https://www.youtube.com/c/GoIT"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            >YouTube</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="container">
+        <div id="app"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <a class="logo" href="#route=home" data-route="home" aria-label="Go to Home">YourEnergy</a>
+
+        <ul class="social" aria-label="Social links">
+          <li>
+            <a
+              href="https://www.facebook.com/goITclub/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              >FB</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.instagram.com/goitclub/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              >IG</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.youtube.com/c/GoIT"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              >YT</a
+            >
+          </li>
+        </ul>
+
+        <p class="footer__slogan">Train daily. Stay strong.</p>
+
+        <form id="subscribeForm" class="subscribe" aria-label="Subscription form">
+          <input name="email" type="email" placeholder="Email" aria-label="Email" required />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
