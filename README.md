@@ -37,4 +37,4 @@ npm run preview
 ## Deploy
 
 GitHub Pages (через Actions):
-- https://vladklopotenko.github.io/kursova_klopotenko/
+- https://github.com/vladklopotenko/kursova_klopotenko-main
