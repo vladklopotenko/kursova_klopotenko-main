@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Energy | Favorites</title>
+    <link rel="stylesheet" href="./css/common.css" />
+  </head>
+  <body>
+    <load src="./partials/header.html" />
+
+    <main>
+      <section class="favorites">
+        <div class="container favorites-container">
+          <h2 class="favorites-title">Favorites</h2>
+
+          <div class="favorites-empty js-favorites-empty is-hidden">
+            <p class="favorites-text">
+              It appears that you haven't added any exercises to your favorites
+              yet...
+            </p>
+          </div>
+
+          <ul class="exercises-list js-favorites-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <load src="./partials/footer.html" />
+
+    <load src="./partials/modal-exercise.html" />
+
+    <script type="module" src="./js/favorites.js"></script>
+    <load src="./partials/rating.html" />
+  </body>
+</html>

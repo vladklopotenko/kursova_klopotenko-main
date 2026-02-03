@@ -1,0 +1,60 @@
+<section class="exercises" id="exercises">
+  <div class="container exercises-container">
+    <div class="exercises-header">
+      <div class="exercises-header-content">
+        <h2 class="exercises-title">Exercises</h2>
+        <p class="exercises-category-title js-category-title"></p>
+      </div>
+
+      <div class="exercises-controls">
+        <form class="search-form js-search-form is-hidden">
+          <div class="search-input-wrapper">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search"
+              name="search"
+              autocomplete="off"
+            />
+            <button type="submit" class="search-btn">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11.9649 11.2749L16.65 15.9547L15.9547 16.65L11.2749 11.9649C10.1411 12.8674 8.70932 13.2985 7.26662 13.1729C5.82392 13.0474 4.47403 12.3742 3.48399 11.2862C2.49395 10.1982 1.93489 8.77443 1.91659 7.29528C1.89828 5.81613 2.42204 4.38755 3.38573 3.29082C4.34942 2.19409 5.6833 1.50974 7.12359 1.3725C8.56388 1.23526 10.0071 1.65507 11.1685 2.54921C12.3299 3.44335 13.1249 4.74758 13.3953 6.20573C13.6657 7.66388 13.3916 9.17046 12.6264 10.455H12.6364H11.9649V11.2749ZM7.61635 12.2152C8.55268 12.2152 9.46736 11.9375 10.2458 11.4173C11.0243 10.897 11.6315 10.1574 11.9898 9.29235C12.3482 8.42732 12.4419 7.47545 12.2593 6.55708C12.0766 5.63871 11.6256 4.79469 10.9635 4.13259C10.3014 3.4705 9.45733 3.01946 8.53896 2.83681C7.62059 2.65415 6.66872 2.7479 5.80369 3.10625C4.93866 3.4646 4.19904 4.07185 3.6788 4.85029C3.15856 5.62874 2.88086 6.54342 2.88086 7.47975C2.8823 8.73516 3.38166 9.93876 4.26927 10.8264C5.15689 11.714 6.36049 12.2133 7.61589 12.2148L7.61635 12.2152Z"
+                  fill="#242424"
+                />
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <ul class="exercises-filter-list js-filter-list">
+          <li>
+            <button class="exercises-filter-btn active" data-filter="Muscles">
+              Muscles
+            </button>
+          </li>
+          <li>
+            <button class="exercises-filter-btn" data-filter="Body parts">
+              Body parts
+            </button>
+          </li>
+          <li>
+            <button class="exercises-filter-btn" data-filter="Equipment">
+              Equipment
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <ul class="exercises-list js-exercises-list"></ul>
+
+    <ul class="pagination js-pagination"></ul>
+  </div>
+</section>
