@@ -4,6 +4,7 @@ import injectHTML from 'vite-plugin-html-inject';
 import FullReload from 'vite-plugin-full-reload';
 import SortCss from 'postcss-sort-media-queries';
 
+<<<<<<< HEAD
 export default defineConfig(({ command }) => {
   return {
     define: {
@@ -34,10 +35,25 @@ export default defineConfig(({ command }) => {
             return 'assets/[name]-[hash][extname]';
           },
         },
+=======
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : '/kursova_klopotenko-main/',
+
+  build: {
+    sourcemap: true,
+    outDir: 'dist',
+    emptyOutDir: true,
+
+    rollupOptions: {
+      input: glob.sync('./*.html'),
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
+>>>>>>> 2d8a1564e674122cfb0064562d38e9a24e11ae0e
       },
-      outDir: '../dist',
-      emptyOutDir: true,
     },
+<<<<<<< HEAD
     plugins: [
       injectHTML(),
       FullReload(['./src/**/**.html']),
@@ -47,3 +63,13 @@ export default defineConfig(({ command }) => {
     ],
   };
 });
+=======
+  },
+
+  plugins: [
+    injectHTML(),
+    FullReload(['./**/*.html']),
+    SortCss({ sort: 'mobile-first' }),
+  ],
+}));
+>>>>>>> 2d8a1564e674122cfb0064562d38e9a24e11ae0e
