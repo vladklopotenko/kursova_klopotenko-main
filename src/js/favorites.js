@@ -1,5 +1,6 @@
 import './scroll-up.js';
 import './mobile-menu.js';
+import './nav-active.js';
 import { openModal } from './modal-exercise.js';
 
 const list = document.querySelector('.js-favorites-list');

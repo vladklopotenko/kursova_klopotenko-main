@@ -9,6 +9,13 @@ const ratingValue = document.querySelector('.js-rating-value');
 
 let currentExerciseId = null;
 let currentRating = 0;
+let returnToExercise = false;
+
+function handleRatingEsc(e) {
+  if (e.key === 'Escape' && backdrop && !backdrop.classList.contains('is-hidden')) {
+    closeRatingModal();
+  }
+}
 
 // --- 1. ВІДКРИТТЯ ---
 export function openRatingModal(id) {
@@ -17,22 +24,34 @@ export function openRatingModal(id) {
   
   // Якщо відкрита модалка вправи, ховаємо її бекдроп (щоб не було два темних фони)
   const exerciseBackdrop = document.querySelector('.js-backdrop'); 
-  if (exerciseBackdrop) exerciseBackdrop.classList.add('is-hidden');
+  returnToExercise = !!(exerciseBackdrop && !exerciseBackdrop.classList.contains('is-hidden'));
+  if (returnToExercise) {
+    exerciseBackdrop.classList.add('is-hidden');
+  }
 
   backdrop.classList.remove('is-hidden');
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', handleRatingEsc);
   resetForm(); // Скидаємо попередні дані
 }
 
 // --- 2. ЗАКРИТТЯ ---
 function closeRatingModal() {
   backdrop.classList.add('is-hidden');
+  document.removeEventListener('keydown', handleRatingEsc);
   
   // Якщо ми закриваємо рейтинг, повертаємо видимість модалки вправи
   const exerciseBackdrop = document.querySelector('.js-backdrop');
-  if (exerciseBackdrop && !exerciseBackdrop.classList.contains('is-hidden')) {
-      // Вона і так відкрита, просто знімаємо клас is-hidden якщо ми його додавали
-      exerciseBackdrop.classList.remove('is-hidden'); 
+  if (returnToExercise && exerciseBackdrop) {
+    // Повертаємо екран з деталями вправи (він залишався відкритим у фоні)
+    exerciseBackdrop.classList.remove('is-hidden');
+    // Скролл лишається заблокованим, бо модалка вправи знову видима
+  } else {
+    // Якщо модалки вправи не було - розблокуємо скролл
+    document.body.style.overflow = '';
   }
+
+  returnToExercise = false;
 }
 
 // --- 3. ЗІРОЧКИ (Клік) ---
