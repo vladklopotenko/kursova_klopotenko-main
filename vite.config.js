@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => {
       [command === 'serve' ? 'global' : '_global']: {},
     },
     root: 'src',
-    base: command === 'serve' ? '/' : '/js-course-work/',
+    base: command === 'serve' ? '/' : '/kursova_klopotenko-main/',
     build: {
       sourcemap: true,
       rollupOptions: {
