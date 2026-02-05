@@ -15,7 +15,6 @@ export async function openModal(id) {
   
   // 1. Показуємо бекдроп
   backdrop.classList.remove('is-hidden');
-    document.addEventListener('keydown', handleKeyDown);
   document.body.style.overflow = 'hidden'; 
   
   modalContent.innerHTML = '<p style="text-align:center; padding:50px;">Loading...</p>';
@@ -38,7 +37,6 @@ export async function openModal(id) {
 
 // --- ЗАКРИТТЯ МОДАЛКИ ---
 function closeModal() {
-  document.removeEventListener('keydown', handleKeyDown);
   backdrop.classList.add('is-hidden');
   document.body.style.overflow = ''; 
   modalContent.innerHTML = ''; 
@@ -57,11 +55,11 @@ if (backdrop) {
   });
 }
 
-function handleKeyDown(e) {
+document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !backdrop.classList.contains('is-hidden')) {
     closeModal();
   }
-}
+});
 
 // --- РОЗМІТКА ---
 function renderModalMarkup(data) {
