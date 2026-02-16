@@ -6,6 +6,9 @@ import SortCss from 'postcss-sort-media-queries';
 
 export default defineConfig(({ command }) => {
   return {
+    // GitHub Pages serves the site from /<repo>/, so in production we use
+    // a relative base to make all assets resolve correctly in any subpath.
+    base: command === 'serve' ? '/' : './',
     define: {
       [command === 'serve' ? 'global' : '_global']: {},
     },
