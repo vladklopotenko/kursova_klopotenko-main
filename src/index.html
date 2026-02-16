@@ -1,26 +1,66 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Energy</title>
-    <link rel="stylesheet" href="./css/common.css" />
+        <!-- DNS prefetch and preconnect for API -->
+    <link rel="dns-prefetch" href="https://your-energy.b.goit.study">
+    <link rel="preconnect" href="https://your-energy.b.goit.study" crossorigin>
+
+    <!-- Preconnect for images CDN -->
+    <link rel="dns-prefetch" href="https://ftp.goit.study">
+    <link rel="preconnect" href="https://ftp.goit.study" crossorigin>
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="./fonts/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/DMSans-Medium.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/DMSans-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Async CSS loading: preload + onload pattern -->
+    <link rel="preload" href="./css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="./css/main.css"></noscript>
+    <script type="module" src="./main.js"></script>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   </head>
   <body>
-    <load src="./partials/header.html" />
+    <load src="partials/icons.html" />
+    <load src="partials/header.html" />
 
-    <main>
-      <load src="./partials/hero.html" />
-      <load src="./partials/filters.html" />
-      <load src="./partials/exercises.html" />
+    <main class="main">
+        <load src="partials/hero.html" />
+
+        <load src="partials/filters.html" />
+
+        <div class="main-content">
+          <div class="container">
+            <section class="content-area" aria-labelledby="exercises-heading">
+              <h2 id="exercises-heading" class="visually-hidden">Exercises List</h2>
+              <ul
+                id="exercises-container"
+                class="categories-grid"
+                aria-live="polite"
+                aria-busy="false"
+              ></ul>
+              <nav id="pagination-container" aria-label="Pagination"></nav>
+            </section>
+  
+            <section class="sidebar" aria-label="Additional information">
+              <load src="partials/quote.html" />
+              <load src="partials/sidebar-image.html" />
+              <load src="partials/info-card.html" />
+            </section>
+          </div>
+        </div>
     </main>
 
-    <load src="./partials/footer.html" />
-
-    <load src="./partials/modal-exercise.html" />
-
-    <script type="module" src="./main.js"></script>
-    <load src="./partials/rating.html" />
+    <load src="partials/footer.html" />
+    <load src="partials/exercise-modal.html" />
+    <load src="partials/rating-modal.html" />
   </body>
 </html>

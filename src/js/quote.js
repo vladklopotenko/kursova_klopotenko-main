@@ -1,52 +1,69 @@
-import { YourEnergyAPI } from './api-service';
+import { getQuote } from './api.js';
+import { renderQuote } from './dom.js';
+import { STORAGE_KEYS } from './constants.js';
 
-const api = new YourEnergyAPI();
-const quoteText = document.querySelector('.js-quote-text');
-const quoteAuthor = document.querySelector('.js-quote-author');
-const LS_KEY = 'quoteOfTheDay';
-
-// Функція отримання поточної дати у форматі "DD/MM/YYYY"
+/**
+ * Get today's date in YYYY-MM-DD format
+ */
 function getTodayDate() {
-  const date = new Date();
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  const today = new Date();
+  return today.toISOString().split('T')[0];
 }
 
-export async function renderQuote() {
-  if (!quoteText) return; // Якщо на сторінці немає блоку цитати
-
-  const today = getTodayDate();
-  
-  // 1. Пробуємо дістати збережену цитату
-  const savedData = JSON.parse(localStorage.getItem(LS_KEY));
-
-  // 2. Якщо цитата є і дата збігається з сьогоднішньою -> малюємо з пам'яті
-  if (savedData && savedData.date === today) {
-    quoteText.textContent = savedData.quote;
-    quoteAuthor.textContent = savedData.author;
-    return;
-  }
-
-  // 3. Якщо немає або дата стара -> робимо запит на сервер
+/**
+ * Get cached quote from localStorage
+ */
+function getCachedQuote() {
   try {
-    const data = await api.getQuote();
-    
-    // Малюємо
-    quoteText.textContent = data.quote;
-    quoteAuthor.textContent = data.author;
+    const cached = localStorage.getItem(STORAGE_KEYS.QUOTE);
+    if (!cached) return null;
 
-    // Зберігаємо в LocalStorage з новою датою
-    localStorage.setItem(LS_KEY, JSON.stringify({
-      quote: data.quote,
-      author: data.author,
-      date: today
-    }));
-    
+    const { quote, author, date } = JSON.parse(cached);
+    const today = getTodayDate();
+
+    if (date === today) {
+      return { quote, author };
+    }
+
+    localStorage.removeItem(STORAGE_KEYS.QUOTE);
+    return null;
   } catch (error) {
-    console.error('Error fetching quote:', error);
-    quoteText.textContent = "Your energy is your greatest strength.";
-    quoteAuthor.textContent = "Unknown";
+    console.error('Error reading cached quote:', error);
+    return null;
+  }
+}
+
+/**
+ * Save quote to localStorage
+ */
+function cacheQuote(quote, author) {
+  try {
+    const data = {
+      quote,
+      author,
+      date: getTodayDate(),
+    };
+    localStorage.setItem(STORAGE_KEYS.QUOTE, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error caching quote:', error);
+  }
+}
+
+/**
+ * Initialize Quote of the Day
+ * Checks cache first, otherwise fetches from API
+ */
+export async function initQuote() {
+  try {
+    let quoteData = getCachedQuote();
+
+    if (!quoteData) {
+      quoteData = await getQuote();
+      cacheQuote(quoteData.quote, quoteData.author);
+    }
+
+    renderQuote(quoteData);
+  } catch (err) {
+    console.error('Failed to initialize quote:', err);
   }
 }

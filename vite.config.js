@@ -10,25 +10,16 @@ export default defineConfig(({ command }) => {
       [command === 'serve' ? 'global' : '_global']: {},
     },
     root: 'src',
-    // For GitHub Pages (served from a subpath), using a relative base ('./')
-    // makes asset URLs work regardless of the repo name.
-    base: command === 'serve' ? '/' : './',
     build: {
       sourcemap: true,
       rollupOptions: {
         input: glob.sync('./src/*.html'),
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return 'vendor';
-            }
+            if (id.includes('node_modules')) return 'vendor';
           },
-          entryFileNames: chunkInfo => {
-            if (chunkInfo.name === 'commonHelpers') {
-              return 'commonHelpers.js';
-            }
-            return '[name].js';
-          },
+          entryFileNames: '[name]-[hash].js',
+          chunkFileNames: '[name]-[hash].js',
           assetFileNames: assetInfo => {
             if (assetInfo.name && assetInfo.name.endsWith('.html')) {
               return '[name].[ext]';
@@ -40,12 +31,11 @@ export default defineConfig(({ command }) => {
       outDir: '../dist',
       emptyOutDir: true,
     },
+
     plugins: [
       injectHTML(),
       FullReload(['./src/**/**.html']),
-      SortCss({
-        sort: 'mobile-first',
-      }),
+      SortCss({ sort: 'mobile-first' }),
     ],
   };
 });

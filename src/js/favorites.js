@@ -1,99 +1,211 @@
-import './scroll-up.js';
-import './mobile-menu.js';
-import './nav-active.js';
-import { openModal } from './modal-exercise.js';
+// Favorites Page
+// Сторінка — "диригент", збирає все разом
 
-const list = document.querySelector('.js-favorites-list');
-const emptyBlock = document.querySelector('.js-favorites-empty');
+import { loadTemplate, replacePlaceholders, runAfterLoad } from './dom.js';
+import { initQuote } from './quote.js';
+import { renderPagination, setupPagination } from './pagination.js';
+import { openExerciseModal } from './exercise-controller.js';
+import { getFavoriteIds, removeFavorite } from './favorites-service.js';
+import { getExerciseById } from './api.js';
+import { BREAKPOINTS, LIMITS, DEBOUNCE_MS } from './constants.js';
 
-// 1. Функція малювання карток (схожа на ту, що була, але для Favorites)
-function createMarkup(arr) {
-  return arr.map(({ _id, name, burnedCalories, time, bodyPart, target }) => `
-    <li class="exercises-item exercise-card-details" data-id="${_id}">
-      <div class="exercise-card-top">
-        <span class="exercise-badge">WORKOUT</span>
-        <button class="favorites-remove-btn js-remove-btn" data-id="${_id}" aria-label="Remove">
-          <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" fill="none">
-            <path d="M3 3L13 13M3 13L13 3" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-        
-        <button class="exercise-start-btn js-start-btn" data-id="${_id}">
-          Start
-          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z" fill="currentColor"/></svg>
-        </button>
-      </div>
-      
-      <div class="exercise-card-title">
-        <div class="exercise-icon-run">
-            <svg viewBox="0 0 32 32"><path d="M7 29.5l-5-4 3.5-3.5 3.5 2.5 4-5-3-3.5 1-4.5 4-2.5 3.5-3.5-1.5-3.5 4.5-2 3 3-1 4.5-5 3.5-2 4 1.5 1.5 3.5-0.5 3 2.5-0.5 3.5-4.5 1-4-2.5-3 2.5z"></path></svg>
-        </div>
-        <h3 class="exercise-title-text">${name}</h3>
-      </div>
+// Re-export service functions for other modules
+export { getFavoriteIds, addFavorite, removeFavorite, isFavorite, toggleFavorite } from './favorites-service.js';
 
-      <ul class="exercise-info-list">
-        <li class="exercise-info-item">Burned calories:<span class="exercise-info-value">${burnedCalories} / ${time} min</span></li>
-        <li class="exercise-info-item">Body part:<span class="exercise-info-value">${bodyPart}</span></li>
-        <li class="exercise-info-item">Target:<span class="exercise-info-value">${target}</span></li>
-      </ul>
-    </li>
-  `).join('');
+// Page state
+const state = {
+  page: 1,
+  exercises: [], // Cached exercises data from API
+};
+
+// Get items per page based on screen width
+function getPerPage() {
+  const width = window.innerWidth;
+  if (width >= BREAKPOINTS.DESKTOP) return Infinity;
+  if (width >= BREAKPOINTS.TABLET) return LIMITS.EXERCISES_TABLET;
+  return LIMITS.EXERCISES_MOBILE;
 }
 
-// 2. Головна функція рендеру
-function renderFavorites() {
-  const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-  if (favorites.length === 0) {
-    list.innerHTML = '';
-    emptyBlock.classList.remove('is-hidden'); // Показуємо "Пусто"
-  } else {
-    emptyBlock.classList.add('is-hidden');
-    list.innerHTML = createMarkup(favorites);
-  }
+// Check if we should use pagination
+function usePagination() {
+  return window.innerWidth < BREAKPOINTS.DESKTOP;
 }
 
-// 3. Обробка кліків (Видалити або Старт)
-list.addEventListener('click', (e) => {
-  // А) Клік по кнопці "Видалити" (смітник)
-  const removeBtn = e.target.closest('.js-remove-btn');
-  if (removeBtn) {
-    const id = removeBtn.dataset.id;
-    removeFromFavorites(id);
+// Render empty state
+async function renderEmptyState(container) {
+  const template = await loadTemplate('favorites-empty');
+  container.innerHTML = template;
+}
+
+// Fetch exercises data from API
+async function fetchFavoritesData() {
+  const favoriteIds = getFavoriteIds();
+
+  if (favoriteIds.length === 0) {
+    state.exercises = [];
     return;
   }
 
-  // Б) Клік по кнопці "Start" (відкрити модалку)
-  const startBtn = e.target.closest('.js-start-btn');
-  if (startBtn) {
-    const id = startBtn.dataset.id;
-    openModal(id);
+  // Fetch all exercises in parallel
+  const exercisePromises = favoriteIds.map(async (id) => {
+    try {
+      return await getExerciseById(id);
+    } catch (err) {
+      console.error(`Failed to fetch exercise ${id}:`, err);
+      // Remove invalid ID from favorites
+      removeFavorite(id);
+      return null;
+    }
+  });
+
+  const exercises = await Promise.all(exercisePromises);
+  state.exercises = exercises.filter(Boolean); // Remove nulls
+}
+
+// Render favorites list
+async function renderFavorites() {
+  const container = document.getElementById('favorites-container');
+  if (!container) return;
+
+  const paginationContainer = document.getElementById('favorites-pagination');
+
+  if (state.exercises.length === 0) {
+    await renderEmptyState(container);
+    if (paginationContainer) {
+      paginationContainer.innerHTML = '';
+    }
+    return;
   }
-});
 
-// Функція видалення
-function removeFromFavorites(id) {
-  const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-  const updatedFavorites = favorites.filter(item => item._id !== id);
-  localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-  
-  // Перемальовуємо список
-  renderFavorites();
+  const perPage = getPerPage();
+  const shouldPaginate = usePagination();
+  const totalPages = shouldPaginate ? Math.ceil(state.exercises.length / perPage) : 1;
+
+  if (state.page > totalPages) {
+    state.page = totalPages;
+  }
+
+  const startIndex = shouldPaginate ? (state.page - 1) * perPage : 0;
+  const endIndex = shouldPaginate ? startIndex + perPage : state.exercises.length;
+  const favorites = state.exercises.slice(startIndex, endIndex);
+
+  const cardTemplate = await loadTemplate('exercise-card');
+
+  const cardsHtml = favorites
+    .map(exercise => {
+      return replacePlaceholders(cardTemplate, {
+        id: exercise._id,
+        name: exercise.name,
+        burnedCalories: exercise.burnedCalories || 0,
+        time: exercise.time || 0,
+        bodyPart: exercise.bodyPart || 'N/A',
+        target: exercise.target || 'N/A',
+        rating: exercise.rating || 0,
+        ratingFormatted: exercise.rating ? exercise.rating.toFixed(1) : '0.0',
+        cardClass: 'is-favorite',
+      });
+    })
+    .join('');
+
+  container.className = 'favorites-grid';
+  container.innerHTML = cardsHtml;
+
+  if (shouldPaginate) {
+    renderPagination(state.page, totalPages, 'favorites-pagination');
+  } else if (paginationContainer) {
+    paginationContainer.innerHTML = '';
+  }
 }
 
-// 4. Підсвітка активного посилання в Хедері
-function highlightActiveLink() {
-    const links = document.querySelectorAll('.nav-link');
-    links.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').includes('favorites.html')) {
-            link.classList.add('active');
-        }
-    });
+// Handle page change
+function handlePageChange(newPage) {
+  if (newPage && newPage !== state.page) {
+    state.page = newPage;
+    renderFavorites();
+  }
 }
 
-// Запуск
-document.addEventListener('DOMContentLoaded', () => {
-  highlightActiveLink();
-  renderFavorites();
-});
+// Setup resize listener
+function setupResizeListener() {
+  let timeoutId;
+  let currentPerPage = getPerPage();
+
+  window.addEventListener('resize', () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      const newPerPage = getPerPage();
+      if (newPerPage !== currentPerPage) {
+        currentPerPage = newPerPage;
+        state.page = 1;
+        renderFavorites();
+      }
+    }, DEBOUNCE_MS);
+  });
+}
+
+// Setup event delegation for favorites container
+function setupEventHandlers() {
+  const container = document.getElementById('favorites-container');
+  if (!container) return;
+
+  if (container.dataset.listenerAttached === 'true') return;
+  container.dataset.listenerAttached = 'true';
+
+  container.addEventListener('click', async (e) => {
+    // Delete button
+    const deleteBtn = e.target.closest('.favorite-delete-btn');
+    if (deleteBtn) {
+      e.stopPropagation();
+      const exerciseId = deleteBtn.dataset.id;
+      if (exerciseId) {
+        removeFavorite(exerciseId);
+        // Remove from cached state
+        state.exercises = state.exercises.filter(ex => ex._id !== exerciseId);
+        await renderFavorites();
+      }
+      return;
+    }
+
+    // Start button
+    const startBtn = e.target.closest('.exercise-start-btn');
+    if (startBtn) {
+      e.stopPropagation();
+      const exerciseId = startBtn.dataset.id;
+      if (!exerciseId) return;
+
+      await openExerciseModal(exerciseId, {
+        isFavoritesPage: true,
+        onRemoveFavorite: async () => {
+          state.exercises = state.exercises.filter(ex => ex._id !== exerciseId);
+          await renderFavorites();
+        },
+      });
+    }
+  });
+}
+
+// Initialize favorites page
+export function initFavoritesPage() {
+  const favoritesPage = document.querySelector('.favorites-page');
+
+  // Setup event listeners immediately (sync - critical for interactivity)
+  setupEventHandlers();
+  setupPagination(handlePageChange, 'favorites-pagination');
+  setupResizeListener();
+
+  // Mark as loaded immediately
+  if (favoritesPage) {
+    favoritesPage.classList.add('loaded');
+  }
+
+  // Defer async operations (non-critical for initial render)
+  runAfterLoad(async () => {
+    try {
+      await initQuote();
+      await fetchFavoritesData();
+      await renderFavorites();
+    } catch (err) {
+      console.error('Error initializing favorites page:', err);
+    }
+  });
+}
